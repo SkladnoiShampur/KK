@@ -1,0 +1,44 @@
+#include <iostream>
+#include <cmath>
+#include <iomanip>
+
+double exampleFunction(double x) {
+    return pow(x, 3) - 0.2 * x * x + 0.5 * x - 1;
+}
+
+double derivativeExampleFunction(double x) {
+    return 3 * pow(x, 2) - 0.4 * x + 0.5;
+}
+
+std::pair<double, int> tangentMethod(double (*f)(double), double (*df)(double), double x0, double epsilon, int max_iter) {
+    double x = x0;
+    for (int iteration = 0; iteration < max_iter; iteration++) {
+        double f_x = f(x);
+        double f_derivative = df(x);
+        double x_new = x - f_x / f_derivative;
+
+        if (std::abs(x_new - x) < epsilon) {
+            return std::make_pair(x_new, iteration + 1);
+        }
+        x = x_new;
+    }
+    return std::make_pair(0.0, max_iter);
+}
+
+int main() {
+    double x0 = 1.0;
+    double epsilon = 1e-6;
+    int max_iter = 100;
+
+    std::pair<double, int> result = tangentMethod(exampleFunction, derivativeExampleFunction, x0, epsilon, max_iter);
+    double root = result.first;
+    int iterations = result.second;
+
+    std::cout << "Корень уравнения: " << std::fixed << std::setprecision(12) << root << std::endl;
+    std::cout << "количество итераций: " << iterations << std::endl;
+
+    double functionValueAtRoot = exampleFunction(root);
+    std::cout << "Значение функции: f(" << root << ")=" << functionValueAtRoot << std::endl;
+
+    return 0;
+}
