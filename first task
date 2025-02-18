@@ -1,0 +1,33 @@
+#include <iostream>
+#include <cmath>
+#include <iomanip>
+
+double exampleFunction(double x) {
+    return x - 0.2 * (x * x + 6.0);
+}
+
+double simpleIterationMethod(double x_0, double epsilon) {
+    double x = x_0;
+    int iter = 0;
+  
+    while (true) {
+        double x_new = 0.2 * (x * x + 6.0);
+        if (std::abs(x_new - x) < epsilon) {
+            std::cout << "Количество итераций: " << iter << std::endl;
+            return x_new;
+        }
+        x = x_new;
+        iter += 1;
+    }
+}
+
+int main() {
+    double x_0 = 0;
+    double epsilon = 1e-2;
+    double root = simpleIterationMethod(x_0, epsilon);
+    std::cout << "Решение уравнения: х = " << root << std::endl;
+    double fun = exampleFunction(root);
+    std::cout << "Значение функции: f(" << root << ") = " << fun << std::endl;
+
+    return 0;
+}
