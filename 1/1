@@ -1,0 +1,8 @@
+import math
+
+V=int (input())
+T=int (input())
+
+ar = math.atan((10*T)/(2*V))
+a=math.degrees(ar)
+print(a)
