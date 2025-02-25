@@ -1,0 +1,38 @@
+// This code is a translation from Python to C++ using standard libraries.
+#include <iostream>
+#include <cmath>
+
+double exampleFunction(double x) {
+    return pow(x, 3) - 0.2 * pow(x, 2) + 0.5 * x - 1;
+}
+
+double dichotomyMethod(double (*function)(double), double a, double b, double epsilon) {
+    if (function(a) * function(b) > 0) {
+        return NAN; // Return NaN if no root exists in the interval
+    }
+    int iterationCount = 0;
+    while ((b - a) / 2 > epsilon) {
+        double c = (a + b) / 2;
+        iterationCount++;
+        if (function(c) == 0) {
+            return c;
+        } else if (function(a) * function(c) < 0) {
+            b = c;
+        } else {
+            a = c;
+        }
+    }
+    std::cout << "Количество итераций: " << iterationCount << std::endl;
+    return (a + b) / 2;
+}
+
+int main() {
+    double a = 0;
+    double b = 3;
+    double epsilon = 1e-10;
+    double root = dichotomyMethod(exampleFunction, a, b, epsilon);
+    std::cout << "Корень уравнения: " << root << std::endl;
+    double functionValue = exampleFunction(root);
+    std::cout << "Значение функции: f(" << root << ") = " << functionValue << std::endl;
+    return 0;
+}
