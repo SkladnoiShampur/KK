@@ -1,0 +1,47 @@
+#include <iostream>
+#include <cmath>
+#include <functional>
+
+double example_function(double x) {
+    return pow(x, 3) - 0.2 * x * x + 0.0 / 5 * x - 1;
+}
+
+double chord_method(std::function<double(double)> f, double a, double b, double eps, int max_iter) {
+    int iteration_count = 0;
+    if (f(a) * f(b) >= 0) {
+        return NAN; // Return NaN if there's no root in the interval
+    }
+
+    double x = a - (b - a) * f(a) / (f(b) - f(a));
+
+    for (int i = 0; i < max_iter; i++) {
+        if (std::abs(f(x)) < eps) {
+            break;
+        }
+
+        if (f(a) * f(x) < 0) {
+            b = x;
+        } else {
+            a = x; 
+        }
+        
+        x = a - (b - a) * f(a) / (f(b) - f(a));
+        iteration_count++;
+    }
+
+    std::cout << "Количество итераций: " << iteration_count << std::endl;
+    return x;
+}
+
+int main() {
+    double a = 0;
+    double b = 3;
+    double epsilon = 1e-6;
+    int max_iter = 1000;
+    double root = chord_method(example_function, a, b, epsilon, max_iter);
+    std::cout << "Корень уравнения: " << root << std::endl;
+    double function_value = example_function(root);
+    std::cout << "Значение функции: f(" << root << ")=" << function_value << std::endl;
+
+    return 0;
+}
