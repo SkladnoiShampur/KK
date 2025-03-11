@@ -1,0 +1,57 @@
+#include <iostream>
+#include <cmath>
+#include <limits>
+
+double find_angle_iterative(double V, double T, double tolerance = 1e-6, int max_iterations = 100) {
+    const double g = 10.0;
+
+    if (T <= 0 || V <= 0) {
+        return std::numeric_limits<double>::quiet_NaN();
+    }
+
+    double angle = M_PI / 2.0;
+
+    for (int i = 0; i < max_iterations; ++i) {
+        double new_angle = asin((g * T) / (2 * V));
+
+        if (std::isnan(new_angle)) {
+            std::cout << "Ошибка: arcsin не определён. Решения не существует." << std::endl;
+            return std::numeric_limits<double>::quiet_NaN();
+        }
+
+        if (fabs(new_angle - angle) < tolerance) {
+            return new_angle * (180.0 / M_PI);
+        }
+
+        angle = new_angle;
+    }
+
+    std::cout << "Превышен лимит итераций" << std::endl;
+    return std::numeric_limits<double>::quiet_NaN();
+}
+
+int main() {
+    double V = 20;  
+    double T = 2.5;  
+
+    double angle = find_angle_iterative(V, T);
+
+    if (!std::isnan(angle)) {
+        std::cout << "Угол бросания: " << angle << " градусов" << std::endl;
+    } else {
+        std::cout << "Невозможно определить угол при заданных параметрах." << std::endl;
+    }
+
+    V = 10; 
+    T = 0.5;  
+
+    angle = find_angle_iterative(V, T);
+
+    if (!std::isnan(angle)) {
+        std::cout << "Угол бросания: " << angle << " градусов" << std::endl;
+    } else {
+        std::cout << "Невозможно определить угол при заданных параметрах." << std::endl;
+    }
+
+    return 0;
+}
