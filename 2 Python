@@ -1,0 +1,99 @@
+import math
+
+def find_angle_iterative_range(V, L, tolerance=1e-6, max_iterations=100):
+
+    g = 10.0  
+
+    if V <= 0 or L < 0:
+        return None
+
+    max_range = (V**2) / g
+
+    if L > max_range:
+        print("Дальность превышает максимальную возможную, при заданной скорости.")
+        return None
+
+    ## between 45 - 0:
+    angle1 = math.pi / 4.0  
+    solution1 = None
+    for i in range(max_iterations):
+        new_angle1 = 0.5 * math.asin((g * L) / (V**2)) 
+
+        if math.isnan(new_angle1):
+            break 
+
+        if abs(new_angle1 - angle1) < tolerance:
+            solution1 = math.degrees(new_angle1)
+            break 
+
+        angle1 = new_angle1
+
+
+    ## between 90 - 45
+    angle2 = math.pi  
+    solution2 = None
+
+    for i in range(max_iterations):
+        new_angle2 = math.pi/2 -  0.5 * math.asin((g * L) / (V**2)) 
+
+        if math.isnan(new_angle2):
+            break 
+
+        if abs(new_angle2 - angle2) < tolerance:
+            solution2 = math.degrees(new_angle2)
+            break 
+
+        angle2 = new_angle2
+
+
+    if solution1 is not None and solution2 is not None:
+        return (solution1, solution2) 
+    elif solution1 is not None:
+        return (solution1,) 
+    elif solution2 is not None:
+        return (solution2,) 
+    else:
+        return None 
+
+
+
+V = 20  
+L = 30  
+
+angles = find_angle_iterative_range(V, L)
+
+if angles is not None:
+    if len(angles) == 2:
+        print(f"Углы бросания: {angles[0]:.2f} градусов и {angles[1]:.2f} градусов")
+    else:
+        print(f"Угол бросания: {angles[0]:.2f} градусов") 
+else:
+    print("Невозможно определить угол при заданных параметрах.")
+
+
+V = 10  
+L = 5  
+
+angles = find_angle_iterative_range(V, L)
+
+if angles is not None:
+    if len(angles) == 2:
+        print(f"Углы бросания: {angles[0]:.2f} градусов и {angles[1]:.2f} градусов")
+    else:
+        print(f"Угол бросания: {angles[0]:.2f} градусов") 
+else:
+    print("Невозможно определить угол при заданных параметрах.")
+
+
+V = 10  
+L = 15 
+
+angles = find_angle_iterative_range(V, L)
+
+if angles is not None:
+    if len(angles) == 2:
+        print(f"Углы бросания: {angles[0]:.2f} градусов и {angles[1]:.2f} градусов")
+    else:
+        print(f"Угол бросания: {angles[0]:.2f} градусов") #
+else:
+    print("Невозможно определить угол при заданных параметрах.")
