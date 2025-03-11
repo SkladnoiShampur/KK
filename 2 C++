@@ -1,0 +1,115 @@
+#include <iostream>
+#include <cmath>
+#include <vector>
+#include <optional>
+
+std::optional<std::vector<double>> find_angle_iterative_range(double V, double L, double tolerance = 1e-6, int max_iterations = 100) {
+    const double g = 10.0;
+
+    if (V <= 0 || L < 0) {
+        return std::nullopt;
+    }
+
+    double max_range = (V * V) / g;
+
+    if (L > max_range) {
+        std::cout << "Дальность превышает максимальную возможную, при заданной скорости." << std::endl;
+        return std::nullopt;
+    }
+
+    // between 45 - 0:
+    double angle1 = M_PI / 4.0;
+    std::optional<double> solution1 = std::nullopt;
+    for (int i = 0; i < max_iterations; ++i) {
+        double new_angle1 = 0.5 * asin((g * L) / (V * V));
+
+        if (std::isnan(new_angle1)) {
+            break;
+        }
+
+        if (fabs(new_angle1 - angle1) < tolerance) {
+            solution1 = new_angle1 * (180.0 / M_PI);
+            break;
+        }
+
+        angle1 = new_angle1;
+    }
+
+    // between 90 - 45
+    double angle2 = M_PI;
+    std::optional<double> solution2 = std::nullopt;
+
+    for (int i = 0; i < max_iterations; ++i) {
+        double new_angle2 = M_PI / 2 - 0.5 * asin((g * L) / (V * V));
+
+        if (std::isnan(new_angle2)) {
+            break;
+        }
+
+        if (fabs(new_angle2 - angle2) < tolerance) {
+            solution2 = new_angle2 * (180.0 / M_PI);
+            break;
+        }
+
+        angle2 = new_angle2;
+    }
+
+    if (solution1.has_value() && solution2.has_value()) {
+        return std::vector<double>{solution1.value(), solution2.value()};
+    } else if (solution1.has_value()) {
+        return std::vector<double>{solution1.value()};
+    } else if (solution2.has_value()) {
+        return std::vector<double>{solution2.value()};
+    } else {
+        return std::nullopt;
+    }
+}
+
+int main() {
+    double V = 20;
+    double L = 30;
+
+    auto angles = find_angle_iterative_range(V, L);
+
+    if (angles.has_value()) {
+        if (angles->size() == 2) {
+            std::cout << "Углы бросания: " << angles->at(0) << " градусов и " << angles->at(1) << " градусов" << std::endl;
+        } else {
+            std::cout << "Угол бросания: " << angles->at(0) << " градусов" << std::endl;
+        }
+    } else {
+        std::cout << "Невозможно определить угол при заданных параметрах." << std::endl;
+    }
+
+    V = 10;
+    L = 5;
+
+    angles = find_angle_iterative_range(V, L);
+
+    if (angles.has_value()) {
+        if (angles->size() == 2) {
+            std::cout << "Углы бросания: " << angles->at(0) << " градусов и " << angles->at(1) << " градусов" << std::endl;
+        } else {
+            std::cout << "Угол бросания: " << angles->at(0) << " градусов" << std::endl;
+        }
+    } else {
+        std::cout << "Невозможно определить угол при заданных параметрах." << std::endl;
+    }
+
+    V = 10;
+    L = 15;
+
+    angles = find_angle_iterative_range(V, L);
+
+    if (angles.has_value()) {
+        if (angles->size() == 2) {
+            std::cout << "Углы бросания: " << angles->at(0) << " градусов и " << angles->at(1) << " градусов" << std::endl;
+        } else {
+            std::cout << "Угол бросания: " << angles->at(0) << " градусов" << std::endl;
+        }
+    } else {
+        std::cout << "Невозможно определить угол при заданных параметрах." << std::endl;
+    }
+
+    return 0;
+}
