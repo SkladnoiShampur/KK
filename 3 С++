@@ -1,0 +1,55 @@
+#include <iostream>
+#include <cmath>
+
+using namespace std;
+
+const double g = 9.8;
+const double EPS = 1e-8;
+
+double calculate_tan_alpha(double H, double L)
+{
+    return 4.0 * H / L;
+}
+
+double calculate_v(double L, double alpha)
+{
+    return sqrt(g * L / sin(2 * alpha));
+}
+
+double find_alpha(double H, double L) 
+{
+    double left = 0, right = 10000, alpha = 0, mid = 0;
+    for (int i = 0; i<1000 && right - left>EPS; i++)
+    {
+        alpha = (left + right) / 2;
+        double tan_alpha = calculate_tan_alpha(H, L);
+        double tan_alpha_cur = tan(alpha);
+        if (tan_alpha_cur < calculate_tan_alpha(H, L))
+        {
+            left = alpha;
+        }
+        else
+        {
+            right = alpha;
+        }
+    }
+    return alpha;
+}
+
+int main() {
+    double H, L;
+
+    cout << "Vvedite H: ";
+    cin >> H;
+
+    cout << "Vvedite L: ";
+    cin >> L;
+
+    double alpha = find_alpha(H, L);
+    double V = calculate_v(L, alpha);
+
+    cout << "alpha: " << alpha/180 << endl;
+    cout << " V: " << V << endl;
+
+    return 0;
+}
