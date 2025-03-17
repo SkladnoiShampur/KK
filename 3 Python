@@ -1,0 +1,41 @@
+import math
+
+g = 9.8
+EPS = 1e-8
+
+def calculate_tan_alpha(H, L):
+    return 4.0 * H / L
+
+def calculate_v(L, alpha):
+    return math.sqrt(g * L / math.sin(2 * alpha))
+
+def find_alpha(H, L):
+    left, right = 0.0, 10000.0
+    alpha = 0.0
+
+    for i in range(1000):
+        if right - left <= EPS:
+            break
+        alpha = (left + right) / 2.0
+        tan_alpha_calculated = calculate_tan_alpha(H, L)
+        tan_alpha_cur = math.tan(alpha)
+
+        if tan_alpha_cur < tan_alpha_calculated:
+            left = alpha
+        else:
+            right = alpha
+
+    return alpha
+
+def main():
+    H = float(input("Vvedite H: "))  # Ensure input is converted to float
+    L = float(input("Vvedite L: "))  # Ensure input is converted to float
+
+    alpha = find_alpha(H, L)
+    V = calculate_v(L, alpha)
+
+    print("alpha:", alpha)
+    print("V:", V)
+
+if name == "main":
+    main()
