@@ -1,0 +1,48 @@
+#include <iostream>
+#include <cmath>
+#include <iomanip>
+
+double simpson_rule(double (*func)(double), double a, double b, int numberOfSegments) {
+    if (numberOfSegments % 2 == 1) {
+        numberOfSegments += 1;
+    }
+    double deltaX = (b - a) / numberOfSegments;
+    double summation = (func(a) + 4 * func(a + deltaX) + func(b));
+    numberOfSegments /= 2;
+    for (int i = 1; i < numberOfSegments; i++) {
+        summation += 2 * func(a + (2 * i) * deltaX) + 4 * func(a + (2 * i + 1) * deltaX);
+    }
+
+    return summation * deltaX / 3;
+}
+
+double func(double x) {
+    return sin(x) / x;
+}
+
+int main() {
+    std::cout << "Используем метод Симпсона" << std::endl;
+    std::cout << "Интегрируемая функция: f(x) = sin(x)/x " << std::endl;
+
+    double a = 1; // Левый край отрезка интегрирования
+    double b = 10; // Правый край отрезка интегрирования 
+    int numberOfSegments = 2; // Начальное количество сегментов
+    double epsilon = 1e-7; // Точность
+
+    std::cout << "a = " << a << ", b = " << b << ", eps = " << epsilon << std::endl;
+
+    double integral1 = simpson_rule(func, a, b, numberOfSegments);
+    numberOfSegments *= 2;
+    double integral2 = simpson_rule(func, a, b, numberOfSegments);
+
+    while (std::abs(integral1 - integral2) > epsilon) {
+        numberOfSegments *= 2;
+        integral1 = simpson_rule(func, a, b, numberOfSegments);
+        numberOfSegments *= 2;
+        integral2 = simpson_rule(func, a, b, numberOfSegments);
+    }
+
+    std::cout << "\nОтвет: I = " << integral2 << "\nКоличество разбиений: " << numberOfSegments << std::endl;
+
+    return 0;
+}
