@@ -1,0 +1,71 @@
+#include <iostream>
+#include <cmath>
+#include <iomanip>
+
+using namespace std;
+
+double calculateTimeDownstream(double S, double V, double U) {
+    return S / (V + U);
+}
+
+double calculateTimeUpstream(double S, double V, double U) {
+    return S / (V - U);
+}
+
+double calculateTotalTimeAnalytic(double S, double V, double U) {
+    return calculateTimeDownstream(S, V, U) + calculateTimeUpstream(S, V, U);
+}
+
+double calculateTotalTimeBinarySearch(double S, double V, double U, double tolerance = 0.0001) {
+    double analyticTotalTime = calculateTotalTimeAnalytic(S, V, U);
+    double left = 0.0;
+    double right = analyticTotalTime * 2; 
+    double middle;
+
+    auto time_difference = [&](double t) { return t - analyticTotalTime; };
+
+    while (right - left > tolerance) {
+        middle = (left + right) / 2.0;
+
+        if (time_difference(middle) < 0) {
+            left = middle;
+        }
+        else {
+            right = middle;
+        }
+    }
+
+    return (left + right) / 2.0;
+}
+
+
+
+int main() {
+    double S, V, U;
+
+    cout << "Vvedite S: ";
+    cin >> S;
+
+    cout << "Vvedite V boat: ";
+    cin >> V;
+
+    cout << "Vvedite U river: ";
+    cin >> U;
+
+    if (V <= U) {
+        cout << "Error. V boat must be higher U river" << endl;
+        return 1;
+    }
+
+    double totalTimeAnalytic = calculateTotalTimeAnalytic(S, V, U);
+
+    double totalTimeBinarySearch = calculateTotalTimeBinarySearch(S, V, U);
+
+
+    cout << fixed << setprecision(6); 
+
+    cout << "Time (analitical): " << totalTimeAnalytic <<  endl;
+    cout << "Time (root): " << totalTimeBinarySearch <<  endl;
+
+    return 0;
+}
