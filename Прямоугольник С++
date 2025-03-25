@@ -1,0 +1,53 @@
+// Framework: C++ Standard Library
+
+#include <iostream>
+#include <cmath>
+#include <iomanip>
+
+// Обобщённое правило прямоугольников с заданием точности
+double rectangleRule(double (*function)(double), double lowerBound, double upperBound, int segments, double fraction) {
+    double deltaX = (upperBound - lowerBound) / segments;
+    double sum = 0.0;
+    double startX = lowerBound + fraction * deltaX;
+    for (int i = 0; i <= segments; ++i) {
+        sum += function(startX + i * deltaX);
+    }
+    return sum * deltaX;
+}
+
+double function(double x) {
+    return sin(x) / x;
+}
+
+int main() {
+    std::cout << "Используем метод прямоугольников." << std::endl;
+    std::cout << "Интегрируемая функция: f(x) = sin(x)/x." << std::endl;
+
+    double a = 1; // Левый край отрезка интегрирования
+    double b = 10; // Правый край отрезка интегрирования
+    int segments = 2; // Начальное количество сегментов
+    double epsilon = 1e-7; // Точность
+    double fraction = 1;
+
+    // Параметр 0 <= frac <= 1 задаёт долю смещения точки, в которой вычисляется функция, от левого края отрезка dx
+    // frac=0 --> метод левых прямоугольников
+    // frac=0.5 --> метод прямоугольников со средней точкой
+    // frac=1 --> метод правых прямоугольников
+    
+    std::cout << "a = " << a << ", b = " << b << ", frac = " << fraction << ", eps = " << epsilon << std::endl;
+
+    double integral1 = rectangleRule(function, a, b, segments, fraction);
+    segments *= 2;
+    double integral2 = rectangleRule(function, a, b, segments, fraction);
+
+    while (fabs(integral1 - integral2) > epsilon) {
+        segments *= 2;
+        integral1 = rectangleRule(function, a, b, segments, fraction);
+        segments *= 2;
+        integral2 = rectangleRule(function, a, b, segments, fraction);
+    }
+
+    std::cout << "\nОтвет: I = " << integral2 << "\nКоличество разбиений: " << segments << std::endl;
+
+    return 0;
+}
