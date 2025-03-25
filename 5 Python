@@ -1,0 +1,50 @@
+import math
+
+G = 9.81  # Ускорение свободного падения
+
+def calculate_fall_time(H):
+    """Calculates the fall time of the bomb using the analytic formula."""
+    return math.sqrt(2 * H / G)
+
+def calculate_distance(U, H):
+    """Calculates the distance using the analytic fall time."""
+    return U * calculate_fall_time(H)
+
+def calculate_fall_time_binary_search(H, tolerance=0.0001):
+    """Calculates the fall time of the bomb using the bisection method."""
+    left = 0.0
+    right = 100.0  # Assume fall time is less than 100 seconds
+
+    def height_difference(t):
+        """Calculates the difference between height and distance fallen at time t."""
+        return H - (G * t**2) / 2
+
+    while right - left > tolerance:
+        middle = (left + right) / 2.0
+
+        if height_difference(middle) > 0:
+            # Bomb hasn't fallen yet, time is too short
+            left = middle
+        else:
+            # Bomb has fallen or very close, time is too long
+            right = middle
+
+    return (left + right) / 2.0
+
+def calculate_distance_binary_search(U, H):
+    """Calculates the distance using the fall time calculated by bisection."""
+    return U * calculate_fall_time_binary_search(H)
+
+
+if __name__ == "__main__":
+    H = float(input("Введите высоту полета самолета H (в метрах): "))
+    U = float(input("Введите скорость самолета U (в м/с): "))
+
+    # Calculate the distance analytically
+    distance_analytic = calculate_distance(U, H)
+
+    # Calculate the distance using the bisection method
+    distance_binary_search = calculate_distance_binary_search(U, H)
+
+    print(f"Подлетное расстояние (аналитически): {distance_analytic} м")
+    print(f"Подлетное расстояние (метод половинного деления): {distance_binary_search} м")
