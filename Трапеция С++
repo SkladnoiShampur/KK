@@ -1,0 +1,45 @@
+#include <iostream>
+#include <cmath>
+
+double trapezoid_rule(double (*function)(double), double start, double end, int segmentCount) {
+    // Trapezoidal rule 
+    // segmentCount - number of segments to divide [start; end]
+    double deltaX = 1.0 * (end - start) / segmentCount;
+    double totalSum = 0.5 * (function(start) + function(end));
+    for (int i = 1; i < segmentCount; i++) {
+        totalSum += function(start + i * deltaX);
+    }
+    
+    return totalSum * deltaX;
+}
+
+double function(double x) {
+    return sin(x) / x;
+}
+
+int main() {
+    std::cout << "Используем метод трапеций" << std::endl;
+    std::cout << "Интегрируемая функция: f(x) = sin(x)/x." << std::endl;
+
+    double start = 1; // Left edge of the integration segment
+    double end = 10;  // Right edge of the integration segment 
+    int segmentCount = 2; // Initial number of segments
+    double epsilon = 1e-7; // Precision
+
+    std::cout << "start = " << start << ", end = " << end << ", epsilon = " << epsilon << std::endl;
+
+    double integral1 = trapezoid_rule(function, start, end, segmentCount);
+    segmentCount *= 2;
+    double integral2 = trapezoid_rule(function, start, end, segmentCount);
+
+    while (std::abs(integral1 - integral2) > epsilon) {
+        segmentCount *= 2;
+        integral1 = trapezoid_rule(function, start, end, segmentCount);
+        segmentCount *= 2;
+        integral2 = trapezoid_rule(function, start, end, segmentCount);
+    }
+    
+    std::cout << "\nОтвет: I = " << integral2 << "\nКоличество разбиений: " << segmentCount << std::endl;
+
+    return 0;
+}
