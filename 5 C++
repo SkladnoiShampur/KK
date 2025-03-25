@@ -1,33 +1,29 @@
 #include <iostream>
 #include <cmath>
-#include <iomanip>
 
 using namespace std;
 
-double calculateTimeDownstream(double S, double V, double U) {
-    return S / (V + U);
+const double G = 9.81; 
+
+double calculateFallTime(double H) {
+    return sqrt(2 * H / G);
 }
 
-double calculateTimeUpstream(double S, double V, double U) {
-    return S / (V - U);
+double calculateDistance(double U, double H) {
+    return U * calculateFallTime(H);
 }
 
-double calculateTotalTimeAnalytic(double S, double V, double U) {
-    return calculateTimeDownstream(S, V, U) + calculateTimeUpstream(S, V, U);
-}
-
-double calculateTotalTimeBinarySearch(double S, double V, double U, double tolerance = 0.0001) {
-    double analyticTotalTime = calculateTotalTimeAnalytic(S, V, U);
+double calculateFallTimeBinarySearch(double H, double tolerance = 0.0001) {
     double left = 0.0;
-    double right = analyticTotalTime * 2; 
+    double right = 100.0; 
     double middle;
 
-    auto time_difference = [&](double t) { return t - analyticTotalTime; };
+    auto height_difference = [&](double t) { return H - (G * t * t) / 2; };
 
     while (right - left > tolerance) {
         middle = (left + right) / 2.0;
 
-        if (time_difference(middle) < 0) {
+        if (height_difference(middle) > 0) {
             left = middle;
         }
         else {
@@ -38,34 +34,26 @@ double calculateTotalTimeBinarySearch(double S, double V, double U, double toler
     return (left + right) / 2.0;
 }
 
-
+double calculateDistanceBinarySearch(double U, double H) {
+    return U * calculateFallTimeBinarySearch(H);
+}
 
 int main() {
-    double S, V, U;
+    double H, U;
 
-    cout << "Vvedite S: ";
-    cin >> S;
+    cout << "Vvedite H: ";
+    cin >> H;
 
-    cout << "Vvedite V boat: ";
-    cin >> V;
-
-    cout << "Vvedite U river: ";
+    cout << "Vvedite V: ";
     cin >> U;
 
-    if (V <= U) {
-        cout << "Error. V boat must be higher U river" << endl;
-        return 1;
-    }
+    double distanceAnalytic = calculateDistance(U, H);
 
-    double totalTimeAnalytic = calculateTotalTimeAnalytic(S, V, U);
-
-    double totalTimeBinarySearch = calculateTotalTimeBinarySearch(S, V, U);
+    double distanceBinarySearch = calculateDistanceBinarySearch(U, H);
 
 
-    cout << fixed << setprecision(6); 
-
-    cout << "Time (analitical): " << totalTimeAnalytic <<  endl;
-    cout << "Time (root): " << totalTimeBinarySearch <<  endl;
+    cout << "Distance (analitic): " << distanceAnalytic << endl;
+    cout << "Distance (root): " << distanceBinarySearch <<  endl;
 
     return 0;
 }
