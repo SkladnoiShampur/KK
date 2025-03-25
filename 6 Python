@@ -1,0 +1,51 @@
+import math
+
+def calculate_time_downstream(S, V, U):
+    """Calculates the time to travel downstream."""
+    return S / (V + U)
+
+def calculate_time_upstream(S, V, U):
+    """Calculates the time to travel upstream."""
+    return S / (V - U)
+
+def calculate_total_time_analytic(S, V, U):
+    """Calculates the total travel time analytically."""
+    return calculate_time_downstream(S, V, U) + calculate_time_upstream(S, V, U)
+
+def calculate_total_time_binary_search(S, V, U, tolerance=0.0001):
+    """Calculates the total travel time using the bisection method."""
+    analytic_total_time = calculate_total_time_analytic(S, V, U)
+    left = 0.0
+    right = analytic_total_time * 2  # Upper bound for the time
+
+    def time_difference(t):
+        """Calculates the difference between the estimated time and analytic time."""
+        return t - analytic_total_time
+
+    while right - left > tolerance:
+        middle = (left + right) / 2.0
+
+        if time_difference(middle) < 0:
+            # Middle is less than the analytic time
+            left = middle
+        else:
+            # Middle is greater than the analytic time
+            right = middle
+
+    return (left + right) / 2.0
+
+
+if __name__ == "__main__":
+    S = float(input("Введите расстояние между пунктами S (в метрах): "))
+    V = float(input("Введите скорость лодки V (в м/с): "))
+    U = float(input("Введите скорость течения реки U (в м/с): "))
+
+    if V <= U:
+        print("Ошибка: скорость лодки должна быть больше скорости течения реки.")
+        exit(1)  # Exit with an error code
+
+    total_time_analytic = calculate_total_time_analytic(S, V, U)
+    total_time_binary_search = calculate_total_time_binary_search(S, V, U)
+
+    print(f"Общее время движения (аналитически): {total_time_analytic:.6f} с")
+    print(f"Общее время движения (метод половинного деления): {total_time_binary_search:.6f} с")
