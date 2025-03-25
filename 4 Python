@@ -1,0 +1,54 @@
+import math
+
+G = 9.81  # Ускорение свободного падения
+
+def calculate_flight_time(H, V, alpha):
+    """Calculates the flight time of the stone using the analytic formula."""
+    return (V * math.sin(alpha) / G) * (1 + math.sqrt(1 + (2 * G * H) / (V**2 * math.sin(alpha)**2)))
+
+def calculate_flight_time_binary_search(H, V, alpha, tolerance=0.0001):
+    """Calculates the flight time of the stone using the bisection method."""
+    left = 0.0  # Lower bound of time
+    right = 100.0  # Upper bound of time
+
+    def y(t):
+        """Calculates the vertical position of the stone at time t."""
+        return H + V * t * math.sin(alpha) - G * t**2 / 2
+
+    while right - left > tolerance:
+        middle = (left + right) / 2.0
+
+        if y(middle) > 0:
+            # Stone hasn't landed yet, time is too short
+            left = middle
+        else:
+            # Stone has landed or is close to landing, time is too long
+            right = middle
+
+    return (left + right) / 2.0  # Return the approximate solution
+
+
+if __name__ == "__main__":
+    H = float(input("Введите высоту обрыва H (в метрах): "))
+    V = float(input("Введите начальную скорость камня V (в м/с): "))
+    alpha = float(input("Введите угол броска alpha (в радианах): "))
+    t = float(input("Введите время t (в секундах): "))
+
+    # Calculate the position of the stone at time t
+    x = V * t * math.cos(alpha)
+    y = H + V * t * math.sin(alpha) - G * t**2 / 2
+
+    print("Положение камня в момент времени t:")
+    print(f"x(t) = {x} м")
+    print(f"y(t) = {y} м")
+
+    # Determine if the stone has fallen to the bottom of the cliff (ternary operator)
+    fell = "Да" if y <= 0 else "Нет"
+    print(f"Камень упал на дно обрыва? {fell}")
+
+    # Calculate flight time
+    flight_time_analytic = calculate_flight_time(H, V, alpha)
+    flight_time_numeric = calculate_flight_time_binary_search(H, V, alpha)
+
+    print(f"Время полета камня (аналитически): {flight_time_analytic} с")
+    print(f"Время полета камня (численно, метод половинного деления): {flight_time_numeric} с")
