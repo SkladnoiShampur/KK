@@ -1,35 +1,46 @@
-def calculate_motorcycle_speeds(average_speed, distance, time_A_to_B):
+def calculate_motorcycle_speeds_iterative(average_speed, distance, time_A_to_B, tolerance=0.0001, max_iterations=100):
   """
-  Вычисляет среднюю скорость мотоциклиста из A в B (V1) и из B в A (V2).
+  Вычисляет V1 и V2 итеративно (неэффективно!).  Только для демонстрации.
 
   Args:
-    average_speed: Средняя скорость движения на всем пути (А -> B -> A) в км/ч.
-    distance: Расстояние между пунктами А и B в км.
-    time_A_to_B: Время движения из пункта А в пункт B в часах.
+    average_speed: Средняя скорость на всем пути.
+    distance: Расстояние между пунктами.
+    time_A_to_B: Время движения из A в B.
+    tolerance: Допустимая погрешность.
+    max_iterations: Максимальное количество итераций.
 
   Returns:
-    Кортеж (V1, V2), где:
-      V1: Средняя скорость из пункта А в пункт B в км/ч.
-      V2: Средняя скорость из пункта B в пункт А в км/ч.
-      None, None: Если невозможно вычислить V2 (например, при делении на ноль).
+    Кортеж (V1, V2).
   """
 
-  V1 = distance / time_A_to_B  # Скорость из A в B
+  V1 = distance / time_A_to_B
 
-  # Проверяем, чтобы average_speed не был равен 0 (чтобы избежать деления на 0)
-  if average_speed == 0:
-    return None, None
+  # Начальное приближение для V2 (можно выбрать любое разумное значение)
+  V2_guess = average_speed
 
-  time_total = (2 * distance) / average_speed  # Общее время в пути (А -> B -> A)
-  time_B_to_A = time_total - time_A_to_B  # Время движения из B в A
+  for i in range(max_iterations):
+    # Вычисляем время движения из B в A, исходя из текущего приближения V2
+    time_B_to_A_guess = distance / V2_guess
 
-  # Проверяем, чтобы время из B в A было положительным числом. Иначе V2 не имеет смысла.
-  if time_B_to_A <= 0:
-    return None, None
+    # Вычисляем общее время, исходя из текущих приближений V1 и V2
+    time_total_guess = time_A_to_B + time_B_to_A_guess
 
-  V2 = distance / time_B_to_A  # Скорость из B в A
+    # Вычисляем новую среднюю скорость, исходя из текущего общего времени
+    average_speed_guess = (2 * distance) / time_total_guess
 
-  return V1, V2
+    # Вычисляем разницу между текущей средней скоростью и заданной
+    diff = abs(average_speed_guess - average_speed)
+
+    # Если разница меньше допустимой погрешности, считаем, что нашли решение
+    if diff < tolerance:
+      return V1, V2_guess
+
+    # Улучшаем приближение V2 (простейший способ: использовать average_speed_guess)
+    V2_guess = V2_guess + (average_speed - average_speed_guess) * 0.1 #регулируем шаг
+
+  # Если не удалось достичь заданной точности за максимальное количество итераций
+  print("Итерации не сошлись к заданному значению")
+  return None, None
 
 
 # Пример использования:
@@ -37,10 +48,18 @@ average_speed = 60  # км/ч
 distance = 120  # км
 time_A_to_B = 2  # часа
 
-V1, V2 = calculate_motorcycle_speeds(average_speed, distance, time_A_to_B)
+V1, V2 = calculate_motorcycle_speeds_iterative(average_speed, distance, time_A_to_B)
 
 if V1 is not None and V2 is not None:
   print(f"Средняя скорость из A в B (V1): {V1:.2f} км/ч")
   print(f"Средняя скорость из B в A (V2): {V2:.2f} км/ч")
 else:
-  print("Невозможно вычислить скорости. Проверьте входные данные.")
+  print("Невозможно вычислить скорости. Итерации не сошлись.")
+
+# Для сравнения, вычисляем аналитическим способом:
+V1_analytic = distance / time_A_to_B
+time_total_analytic = (2 * distance) / average_speed
+time_B_to_A_analytic = time_total_analytic - time_A_to_B
+if time_B_to_A_analytic > 0:
+    V2_analytic = distance / time_B_to_A_analytic
+    print(f"Аналитическое решение: V2 = {V2_analytic:.2f} км/ч")
