@@ -19,18 +19,19 @@ def simpson_rule(func, a, b, nseg):
 
 
 def func(x):
-  """Подынтегральная функция (sin(x)/x)."""
+  """Подынтегральная функция (x^n * ln(x))."""
+  n = 2  # Set the value of n (you can change this)
   if x == 0:
-        return 1.0 # Handle singularity at x=0 using L'Hopital's rule, sin(x)/x -> 1 as x -> 0
-  return math.sin(x) / x
+      return 0.0 # Handle singularity:  lim x->0  x^n * ln(x) = 0 for n > 0.
+  return (x**n) * math.log(x)
 
 # Main Program
 
 print("Используем метод Симпсона")
-print("Интегрируемая функция: f(x) = sin(x)/x")
+print("Интегрируемая функция: f(x) = x^n * ln(x)")
 
-a = 1       # Левый край отрезка интегрирования
-b = 10      # Правый край отрезка интегрирования
+a = 0       # Левый край отрезка интегрирования
+b = 1      # Правый край отрезка интегрирования
 nseg = 2    # Начальное количество сегментов
 eps = 1e-7  # Точность
 
@@ -44,5 +45,10 @@ while abs(int_1 - int_2) > eps:
   nseg *= 2
   int_1 = simpson_rule(func, a, b, nseg)
   int_2 = simpson_rule(func, a, b, nseg)
+
+  if nseg > 100000:
+      print("Warning: Max iterations/segments reached. Result might not be accurate.")
+      break
+
 
 print("Ответ: I =", int_2, ", Количество разбиений=", nseg)
