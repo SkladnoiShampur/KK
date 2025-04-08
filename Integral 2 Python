@@ -19,16 +19,16 @@ def simpson_rule(func, a, b, nseg):
 
 
 def func(x):
-  """Подынтегральная функция (e^(-2x) * sin(2x))."""
-  return math.exp(-2*x) * math.sin(2*x)
+  """Подынтегральная функция (e^(-x) * sin(2x))."""
+  return math.exp(-x) * math.sin(2*x)
 
 # Main Program
 
 print("Используем метод Симпсона")
-print("Интегрируемая функция: f(x) = e^(-2x) * sin(2x)")
+print("Интегрируемая функция: f(x) = e^(-x) * sin(2x)")
 
 a = 0       # Левый край отрезка интегрирования
-b = 10       # Choose a finite upper limit. Experiment with larger values.
+b = 10      # Choose a finite upper limit.  Experiment with larger values.
 nseg = 2    # Начальное количество сегментов
 eps = 1e-7  # Точность
 
