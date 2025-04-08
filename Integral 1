@@ -1,0 +1,89 @@
+import math
+
+def f(x, alpha):
+  """Подынтегральная функция."""
+  if x == 0:
+    return 0.0  # Handle the singularity at x=0
+  return x**alpha * math.log(x)
+
+def simpson(f, a, b, n, alpha):
+  """Метод Симпсона для численного интегрирования.
+
+  Args:
+    f: Подынтегральная функция.
+    a: Нижний предел интегрирования.
+    b: Верхний предел интегрирования.
+    n: Количество интервалов (должно быть четным).
+    alpha: параметр alpha в f(x)
+
+  Returns:
+    Численное значение интеграла.
+  """
+
+  if n % 2 != 0:
+    raise ValueError("n must be an even number")
+
+  h = (b - a) / n
+  s = f(a, alpha) + f(b, alpha)
+
+  for i in range(1, n, 2):
+    s += 4 * f(a + i * h, alpha)
+
+  for i in range(2, n - 1, 2):
+    s += 2 * f(a + i * h, alpha)
+
+  return h * s / 3
+
+def adaptive_simpson(f, a, b, eps, alpha):
+    """Адаптивный метод Симпсона для достижения заданной точности.
+
+    Args:
+        f: Подынтегральная функция.
+        a: Нижний предел интегрирования.
+        b: Верхний предел интегрирования.
+        eps: Требуемая точность.
+        alpha: параметр alpha в f(x)
+
+    Returns:
+        Численное значение интеграла.
+    """
+
+    n = 4  # Initial number of intervals
+    I_old = simpson(f, a, b, n, alpha)
+    n *= 2
+    I_new = simpson(f, a, b, n, alpha)
+
+    while abs(I_new - I_old) / 15.0 > eps:  # Error estimate for Simpson's rule
+        I_old = I_new
+        n *= 2
+        I_new = simpson(f, a, b, n, alpha)
+
+        if n > 1000000: # Add a maximum iteration to prevent infinite loop
+          print("Warning: Max iterations reached.  Result may not meet tolerance.")
+          break
+
+    return I_new
+
+
+# Пример использования:
+alpha_value = -0.5  # Choose an alpha value
+a = 0.0         # Lower Limit
+b = 1.0         # Upper Limit
+tolerance = 1e-6  # desired accuracy
+
+try:
+    result = adaptive_simpson(f, a, b, tolerance, alpha_value)
+    print(f"Численное значение интеграла (alpha={alpha_value}): {result}")
+except Exception as e:
+    print(f"Произошла ошибка: {e}")
+
+
+print("\nTrying different alpha values to see if the integral diverges:")
+for alpha in [-2, -1, -0.9, -0.7, -0.5, -0.2, 0, 0.5, 1]:
+    try:
+        result = adaptive_simpson(f, a, b, tolerance, alpha)
+        print(f"alpha={alpha}: Integral = {result}")
+    except OverflowError:
+        print(f"alpha={alpha}: Integral diverges (Overflow)")
+    except Exception as e:
+        print(f"alpha={alpha}: Integral likely diverges or has singularity issues: {e}")
