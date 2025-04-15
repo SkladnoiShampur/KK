@@ -1,0 +1,57 @@
+#include <iostream>
+#include <cmath>
+
+double simpson_rule(double (*func)(double), double a, double b, int nseg) {
+    if (nseg % 2 != 0) {
+        nseg += 1;  
+    }
+
+    double dx = 1.0 * (b - a) / nseg;
+    double total_sum = func(a) + func(b);
+
+    for (int i = 1; i < nseg; i += 2) {
+        total_sum += 4 * func(a + i * dx);
+    }
+
+    for (int i = 2; i < nseg - 1; i += 2) {
+        total_sum += 2 * func(a + i * dx);
+    }
+
+    return total_sum * dx / 3;
+}
+
+double func(double x) {
+    // Подынтегральная функция (1/((1+x)*sqrt(x))).
+    return 1/((1+x)*sqrt(x));
+}
+
+int main() {
+    std::cout << "Используем метод Симпсона" << std::endl;
+    std::cout << "Интегрируемая функция: f(x) = 1/(x*x)*sin(1/x)" << std::endl;
+
+    double a = 1;       // Левый край отрезка интегрирования
+    double b = 10;      // Правый край отрезка интегрирования
+    int nseg = 2;       // Начальное количество сегментов
+    double eps = 1e-7;  // Точность
+
+    std::cout << " a = " << a << ", b = " << b << ", eps = " << eps << std::endl;
+
+    double int_1 = simpson_rule(func, a, b, nseg);
+    nseg *= 2;
+    double int_2 = simpson_rule(func, a, b, nseg);
+
+    while (fabs(int_1 - int_2) > eps) {
+        nseg *= 2;
+        int_1 = simpson_rule(func, a, b, nseg);
+        int_2 = simpson_rule(func, a, b, nseg);
+
+        if (nseg > 100000) {
+            std::cout << "Warning: Max iterations/segments reached. Result might not be accurate." << std::endl;
+            break;
+        }
+    }
+
+    std::cout << "Ответ: I = " << int_2 << ", Количество разбиений = " << nseg << std::endl;
+
+    return 0;
+}
