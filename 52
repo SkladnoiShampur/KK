@@ -1,0 +1,383 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <string>
+#include <sstream>
+#include <limits>
+
+using namespace std;
+
+// Класс Пицца
+class Pizza {
+public:
+    string name;
+    string size;
+    double price;
+    string ingredients;
+};
+
+// Класс Закуски
+class Snack {
+public:
+    string name;
+    double price;
+    int weight;
+};
+
+// Класс Напитки
+class Drink {
+public:
+    string name;
+    double price;
+    string volume;
+    bool isAlcoholic;
+};
+
+// Глобальные векторы для хранения данных
+vector<Pizza> pizzas;
+vector<Snack> snacks;
+vector<Drink> drinks;
+
+// Функция для очистки буфера ввода
+void clearInputBuffer() {
+    cin.clear();
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+}
+
+// Функция сохранения данных в файл
+void saveToFile(const string& filename) {
+    ofstream file(filename);
+    
+    // Сохраняем пиццы
+    for (const auto& p : pizzas) {
+        file << "Pizza " << p.name << " " << p.size << " " << p.price << " " << p.ingredients << endl;
+    }
+    
+    // Сохраняем закуски
+    for (const auto& s : snacks) {
+        file << "Snack " << s.name << " " << s.price << " " << s.weight << endl;
+    }
+    
+    // Сохраняем напитки
+    for (const auto& d : drinks) {
+        file << "Drink " << d.name << " " << d.price << " " << d.volume << " " << d.isAlcoholic << endl;
+    }
+    
+    file.close();
+    cout << "Данные сохранены в файл: " << filename << endl;
+}
+
+// Функция загрузки данных из файла
+void loadFromFile(const string& filename) {
+    ifstream file(filename);
+    if (!file.is_open()) {
+        cerr << "Ошибка открытия файла!" << endl;
+        return;
+    }
+    
+    pizzas.clear();
+    snacks.clear();
+    drinks.clear();
+    
+    string line;
+    while (getline(file, line)) {
+        istringstream iss(line);
+        string type;
+        iss >> type;
+        
+        if (type == "Pizza") {
+            Pizza p;
+            iss >> p.name >> p.size >> p.price;
+            getline(iss, p.ingredients); // Читаем оставшуюся часть строки как ингредиенты
+            // Удаляем начальный пробел, если он есть
+            if (!p.ingredients.empty() && p.ingredients[0] == ' ') {
+                p.ingredients.erase(0, 1);
+            }
+            pizzas.push_back(p);
+        } else if (type == "Snack") {
+            Snack s;
+            iss >> s.name >> s.price >> s.weight;
+            snacks.push_back(s);
+        } else if (type == "Drink") {
+            Drink d;
+            string alcoholic;
+            iss >> d.name >> d.price >> d.volume >> alcoholic;
+            d.isAlcoholic = (alcoholic == "1");
+            drinks.push_back(d);
+        }
+    }
+    
+    file.close();
+    cout << "Данные загружены из файла: " << filename << endl;
+}
+
+// Функция добавления пиццы
+void addPizza() {
+    Pizza p;
+    
+    cout << "Введите название пиццы: ";
+    clearInputBuffer();
+    getline(cin, p.name);
+    
+    cout << "Введите размер (S/M/L): ";
+    cin >> p.size;
+    
+    cout << "Введите цену: ";
+    while (!(cin >> p.price) || p.price <= 0) {
+        cout << "Неверный ввод! Введите положительное число: ";
+        clearInputBuffer();
+    }
+    
+    cout << "Введите ингредиенты (через запятую): ";
+    clearInputBuffer();
+    getline(cin, p.ingredients);
+    
+    pizzas.push_back(p);
+    cout << "Пицца \"" << p.name << "\" добавлена в меню!" << endl;
+}
+
+// Функция добавления закуски
+void addSnack() {
+    Snack s;
+    
+    cout << "Введите название закуски: ";
+    clearInputBuffer();
+    getline(cin, s.name);
+    
+    cout << "Введите цену: ";
+    while (!(cin >> s.price) || s.price <= 0) {
+        cout << "Неверный ввод! Введите положительное число: ";
+        clearInputBuffer();
+    }
+    
+    cout << "Введите вес (в граммах): ";
+    while (!(cin >> s.weight) || s.weight <= 0) {
+        cout << "Неверный ввод! Введите положительное число: ";
+        clearInputBuffer();
+    }
+    
+    snacks.push_back(s);
+    cout << "Закуска \"" << s.name << "\" добавлена в меню!" << endl;
+}
+
+// Функция добавления напитка
+void addDrink() {
+    Drink d;
+    
+    cout << "Введите название напитка: ";
+    clearInputBuffer();
+    getline(cin, d.name);
+    
+    cout << "Введите цену: ";
+    while (!(cin >> d.price) || d.price <= 0) {
+        cout << "Неверный ввод! Введите положительное число: ";
+        clearInputBuffer();
+    }
+    
+    cout << "Введите объем (250ml/500ml/1L): ";
+    cin >> d.volume;
+    
+    cout << "Алкогольный? (1 - да, 0 - нет): ";
+    while (!(cin >> d.isAlcoholic) || (d.isAlcoholic != 0 && d.isAlcoholic != 1)) {
+        cout << "Неверный ввод! Введите 1 или 0: ";
+        clearInputBuffer();
+    }
+    
+    drinks.push_back(d);
+    cout << "Напиток \"" << d.name << "\" добавлен в меню!" << endl;
+}
+
+// Функция вывода всего меню
+void printMenu() {
+    cout << "\n=== Меню пиццерии ===" << endl;
+    
+    cout << "\n--- Пиццы (" << pizzas.size() << ") ---" << endl;
+    for (size_t i = 0; i < pizzas.size(); ++i) {
+        cout << i+1 << ". " << pizzas[i].name << " (" << pizzas[i].size << ") - " << pizzas[i].price << " руб.\n";
+        cout << "   Ингредиенты: " << pizzas[i].ingredients << endl;
+    }
+    
+    cout << "\n--- Закуски (" << snacks.size() << ") ---" << endl;
+    for (size_t i = 0; i < snacks.size(); ++i) {
+        cout << i+1 << ". " << snacks[i].name << " - " << snacks[i].price << " руб. (" << snacks[i].weight << "г)\n";
+    }
+    
+    cout << "\n--- Напитки (" << drinks.size() << ") ---" << endl;
+    for (size_t i = 0; i < drinks.size(); ++i) {
+        cout << i+1 << ". " << drinks[i].name << " (" << drinks[i].volume << ") - " << drinks[i].price << " руб. ";
+        cout << (drinks[i].isAlcoholic ? "[Алкогольный]" : "[Безалкогольный]") << endl;
+    }
+}
+
+// Функция обновления записи
+void updateItem() {
+    cout << "Выберите категорию для обновления (1 - пиццы, 2 - закуски, 3 - напитки): ";
+    int category;
+    while (!(cin >> category) || category < 1 || category > 3) {
+        cout << "Неверный ввод! Введите число от 1 до 3: ";
+        clearInputBuffer();
+    }
+    
+    printMenu();
+    if ((category == 1 && pizzas.empty()) || 
+        (category == 2 && snacks.empty()) || 
+        (category == 3 && drinks.empty())) {
+        cout << "В этой категории нет позиций для обновления!" << endl;
+        return;
+    }
+    
+    cout << "Введите номер позиции для обновления: ";
+    int index;
+    while (!(cin >> index) || index < 1 || 
+           (category == 1 && index > (int)pizzas.size()) ||
+           (category == 2 && index > (int)snacks.size()) ||
+           (category == 3 && index > (int)drinks.size())) {
+        cout << "Неверный номер позиции! Попробуйте снова: ";
+        clearInputBuffer();
+    }
+    index--;
+    
+    if (category == 1) {
+        cout << "Введите новое название пиццы (текущее: " << pizzas[index].name << "): ";
+        clearInputBuffer();
+        getline(cin, pizzas[index].name);
+        
+        cout << "Введите новый размер (S/M/L) (текущий: " << pizzas[index].size << "): ";
+        cin >> pizzas[index].size;
+        
+        cout << "Введите новую цену (текущая: " << pizzas[index].price << "): ";
+        while (!(cin >> pizzas[index].price) || pizzas[index].price <= 0) {
+            cout << "Неверный ввод! Введите положительное число: ";
+            clearInputBuffer();
+        }
+        
+        cout << "Введите новые ингредиенты (текущие: " << pizzas[index].ingredients << "): ";
+        clearInputBuffer();
+        getline(cin, pizzas[index].ingredients);
+    } 
+    else if (category == 2) {
+        cout << "Введите новое название закуски (текущее: " << snacks[index].name << "): ";
+        clearInputBuffer();
+        getline(cin, snacks[index].name);
+        
+        cout << "Введите новую цену (текущая: " << snacks[index].price << "): ";
+        while (!(cin >> snacks[index].price) || snacks[index].price <= 0) {
+            cout << "Неверный ввод! Введите положительное число: ";
+            clearInputBuffer();
+        }
+        
+        cout << "Введите новый вес (в граммах) (текущий: " << snacks[index].weight << "): ";
+        while (!(cin >> snacks[index].weight) || snacks[index].weight <= 0) {
+            cout << "Неверный ввод! Введите положительное число: ";
+            clearInputBuffer();
+        }
+    } 
+    else if (category == 3) {
+        cout << "Введите новое название напитка (текущее: " << drinks[index].name << "): ";
+        clearInputBuffer();
+        getline(cin, drinks[index].name);
+        
+        cout << "Введите новую цену (текущая: " << drinks[index].price << "): ";
+        while (!(cin >> drinks[index].price) || drinks[index].price <= 0) {
+            cout << "Неверный ввод! Введите положительное число: ";
+            clearInputBuffer();
+        }
+        
+        cout << "Введите новый объем (250ml/500ml/1L) (текущий: " << drinks[index].volume << "): ";
+        cin >> drinks[index].volume;
+        
+        cout << "Алкогольный? (1 - да, 0 - нет) (текущее: " << drinks[index].isAlcoholic << "): ";
+        while (!(cin >> drinks[index].isAlcoholic) || (drinks[index].isAlcoholic != 0 && drinks[index].isAlcoholic != 1)) {
+            cout << "Неверный ввод! Введите 1 или 0: ";
+            clearInputBuffer();
+        }
+    }
+    
+    cout << "Позиция успешно обновлена!" << endl;
+}
+
+// Функция удаления записи
+void deleteItem() {
+    cout << "Выберите категорию для удаления (1 - пиццы, 2 - закуски, 3 - напитки): ";
+    int category;
+    while (!(cin >> category) || category < 1 || category > 3) {
+        cout << "Неверный ввод! Введите число от 1 до 3: ";
+        clearInputBuffer();
+    }
+    
+    printMenu();
+    if ((category == 1 && pizzas.empty()) || 
+        (category == 2 && snacks.empty()) || 
+        (category == 3 && drinks.empty())) {
+        cout << "В этой категории нет позиций для удаления!" << endl;
+        return;
+    }
+    
+    cout << "Введите номер позиции для удаления: ";
+    int index;
+    while (!(cin >> index) || index < 1 || 
+           (category == 1 && index > (int)pizzas.size()) ||
+           (category == 2 && index > (int)snacks.size()) ||
+           (category == 3 && index > (int)drinks.size())) {
+        cout << "Неверный номер позиции! Попробуйте снова: ";
+        clearInputBuffer();
+    }
+    index--;
+    
+    string deletedName;
+    if (category == 1) {
+        deletedName = pizzas[index].name;
+        pizzas.erase(pizzas.begin() + index);
+    } 
+    else if (category == 2) {
+        deletedName = snacks[index].name;
+        snacks.erase(snacks.begin() + index);
+    } 
+    else if (category == 3) {
+        deletedName = drinks[index].name;
+        drinks.erase(drinks.begin() + index);
+    }
+    
+    cout << "Позиция \"" << deletedName << "\" успешно удалена из меню!" << endl;
+}
+
+// Главное меню программы
+int main() {
+    setlocale(LC_ALL, "Russian");
+    
+    int choice;
+    string filename = "pizzeria_menu.txt";
+    
+    do {
+        cout << "\n=== Управление меню пиццерии ===" << endl;
+        cout << "1. Добавить пиццу" << endl;
+        cout << "2. Добавить закуску" << endl;
+        cout << "3. Добавить напиток" << endl;
+        cout << "4. Просмотреть меню" << endl;
+        cout << "5. Обновить позицию" << endl;
+        cout << "6. Удалить позицию" << endl;
+        cout << "7. Сохранить меню в файл" << endl;
+        cout << "8. Загрузить меню из файла" << endl;
+        cout << "0. Выход" << endl;
+        cout << "Выберите действие: ";
+        
+        while (!(cin >> choice) || choice < 0 || choice > 8) {
+            cout << "Неверный ввод! Введите число от 0 до 8: ";
+            clearInputBuffer();
+        }
+        
+        switch (choice) {
+            case 1: addPizza(); break;
+            case 2: addSnack(); break;
+            case 3: addDrink(); break;
+            case 4: printMenu(); break;
+            case 5: updateItem(); break;
+            case 6: deleteItem(); break;
+            case 7: saveToFile(filename); break;
+            case 8: loadFromFile(filename); break;
+            case 0: cout << "Выход из программы..." << endl; break;
+        }
+    } while (choice != 0);
+    
+    return 0;
+}
