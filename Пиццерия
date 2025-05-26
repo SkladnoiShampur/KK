@@ -1,0 +1,156 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <string>
+#include <sstream>
+
+using namespace std;
+
+// Класс Пицца
+class Pizza {
+public:
+    string name;
+    string size;
+    double price;
+    string ingredients;
+};
+
+// Класс Закуски
+class Snack {
+public:
+    string name;
+    double price;
+    int weight;
+};
+
+// Класс Напитки
+class Drink {
+public:
+    string name;
+    double price;
+    string volume;
+    bool isAlcoholic;
+};
+
+// Глобальные векторы для хранения данных
+vector<Pizza> pizzas;
+vector<Snack> snacks;
+vector<Drink> drinks;
+
+// Функция сохранения данных в файл
+void saveToFile(const string& filename) {
+    ofstream file(filename);
+    
+    // Сохраняем пиццы
+    for (const auto& p : pizzas) {
+        file << "Pizza " << p.name << " " << p.size << " " << p.price << " " << p.ingredients << endl;
+    }
+    
+    // Сохраняем закуски
+    for (const auto& s : snacks) {
+        file << "Snack " << s.name << " " << s.price << " " << s.weight << endl;
+    }
+    
+    // Сохраняем напитки
+    for (const auto& d : drinks) {
+        file << "Drink " << d.name << " " << d.price << " " << d.volume << " " << d.isAlcoholic << endl;
+    }
+    
+    file.close();
+    cout << "Данные сохранены в файл: " << filename << endl;
+}
+
+// Функция загрузки данных из файла
+void loadFromFile(const string& filename) {
+    ifstream file(filename);
+    if (!file.is_open()) {
+        cerr << "Ошибка открытия файла!" << endl;
+        return;
+    }
+    
+    pizzas.clear();
+    snacks.clear();
+    drinks.clear();
+    
+    string line;
+    while (getline(file, line)) {
+        istringstream iss(line);
+        string type;
+        iss >> type;
+        
+        if (type == "Pizza") {
+            Pizza p;
+            iss >> p.name >> p.size >> p.price;
+            getline(iss, p.ingredients); // Читаем оставшуюся часть строки как ингредиенты
+            pizzas.push_back(p);
+        } else if (type == "Snack") {
+            Snack s;
+            iss >> s.name >> s.price >> s.weight;
+            snacks.push_back(s);
+        } else if (type == "Drink") {
+            Drink d;
+            string alcoholic;
+            iss >> d.name >> d.price >> d.volume >> alcoholic;
+            d.isAlcoholic = (alcoholic == "1");
+            drinks.push_back(d);
+        }
+    }
+    
+    file.close();
+    cout << "Данные загружены из файла: " << filename << endl;
+}
+
+// Функция добавления пиццы
+void addPizza() {
+    Pizza p;
+    cout << "Введите название пиццы: ";
+    cin.ignore();
+    getline(cin, p.name);
+    cout << "Введите размер (S/M/L): ";
+    cin >> p.size;
+    cout << "Введите цену: ";
+    cin >> p.price;
+    cout << "Введите ингредиенты (через запятую): ";
+    cin.ignore();
+    getline(cin, p.ingredients);
+    pizzas.push_back(p);
+    cout << "Пицца добавлена в меню!" << endl;
+}
+
+// Функция добавления закуски
+void addSnack() {
+    Snack s;
+    cout << "Введите название закуски: ";
+    cin.ignore();
+    getline(cin, s.name);
+    cout << "Введите цену: ";
+    cin >> s.price;
+    cout << "Введите вес (в граммах): ";
+    cin >> s.weight;
+    snacks.push_back(s);
+    cout << "Закуска добавлена в меню!" << endl;
+}
+
+// Функция добавления напитка
+void addDrink() {
+    Drink d;
+    cout << "Введите название напитка: ";
+    cin.ignore();
+    getline(cin, d.name);
+    cout << "Введите цену: ";
+    cin >> d.price;
+    cout << "Введите объем (250ml/500ml/1L): ";
+    cin >> d.volume;
+    cout << "Алкогольный? (1 - да, 0 - нет): ";
+    cin >> d.isAlcoholic;
+    drinks.push_back(d);
+    cout << "Напиток добавлен в меню!" << endl;
+}
+
+// Функция вывода всего меню
+void printMenu() {
+    cout << "\n=== Меню пиццерии ===" << endl;
+    
+    cout << "\n--- Пиццы ---" << endl;
+    for (size_t i = 0; i < pizzas.size(); ++i) {
+        cout << i+1 << ". " << pizzas[i].name << " (" << pizzas[i].size << ") - " << pizzas[i].price << " руб.\n";
