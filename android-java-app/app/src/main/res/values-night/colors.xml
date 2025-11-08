@@ -1,0 +1,5 @@
+<resources>
+    <color name="secondaryContainer">#4A4458</color>
+    <color name="onSecondaryContainer">#EAE0F8</color>
+    <color name="card_stroke">#33FFFFFF</color>
+</resources>

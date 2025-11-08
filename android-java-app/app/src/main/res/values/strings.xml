@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Quick Notes</string>
+    <string name="action_add">Добавить</string>
+    <string name="hint_note">Новая заметка</string>
+    <string name="error_empty_note">Введите текст заметки</string>
+    <string name="empty_state_title">Заметок пока нет</string>
+    <string name="empty_state_description">Добавьте первую запись, чтобы не забыть важные идеи.</string>
+</resources>
