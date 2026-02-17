@@ -1,0 +1,24 @@
+import time
+from collections import Counter
+
+def test_counter(data):
+    start = time.time()
+    Counter(data)
+    return time.time() - start
+
+def test_dict(data):
+    start = time.time()
+    freq = {}
+    for item in data:
+        freq[item] = freq.get(item, 0) + 1
+    return time.time() - start
+
+# Замерьте время для каждого размера данных
+sizes = [100, 1000, 10000, 100000, 1000000]
+results_counter = []
+results_dict = []
+
+for size in sizes:
+    data = [str(i % 100) for i in range(size)]  # Пример данных
+    results_counter.append(test_counter(data))
+    results_dict.append(test_dict(data))
